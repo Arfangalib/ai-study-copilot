@@ -15,7 +15,7 @@ const schema = z.object({
   RETRIEVAL_TOP_K: z.coerce.number().int().positive().default(6),
   // Spend protection for the public demo.
   RATE_LIMIT_PER_MIN: z.coerce.number().int().positive().default(5),
-  DAILY_REQUEST_CAP: z.coerce.number().int().positive().default(300),
+  DAILY_REQUEST_CAP: z.coerce.number().int().positive().default(60),
 });
 
 const parsed = schema.safeParse(process.env);
