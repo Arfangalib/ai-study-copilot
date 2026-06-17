@@ -80,4 +80,6 @@ src/
 
 ## Status
 
-Week 1 vertical slice: ingestion, grounded ask (cite-or-refuse), and UI are implemented and deployable. Bug-hunt mode, weak-topic tracking, and the eval dashboard follow.
+- **Week 1 — done.** Ingestion, grounded ask (cite-or-refuse), UI, deployed live.
+- **Week 2 — done.** Bug-Hunt mode (diagnosis labeled as model inference → cited concept from notes → grounded practice questions), server-side quiz grading, and EWMA weak-topic tracking.
+- **Next:** Week 3 evaluation dashboard (citation precision, refusal accuracy, answer support rate), then polish + case study.
