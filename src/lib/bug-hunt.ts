@@ -67,6 +67,23 @@ function buildContext(chunks: RetrievedChunk[]): string {
 }
 
 /**
+ * Normalize a model-inferred topic to a short, clean label so the dashboard
+ * stays tidy. e.g. "Sliding window / longest substring..." -> "sliding window".
+ */
+export function canonicalizeTopic(raw: string): string {
+  const cleaned = raw
+    .toLowerCase()
+    .split(/[/,;:(]/)[0] // keep the part before a slash / comma / colon / paren
+    .replace(/[^a-z0-9 +&-]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 4) // cap at 4 words
+    .join(" ")
+    .trim();
+  return cleaned || raw.toLowerCase().trim();
+}
+
+/**
  * Bug-hunt pipeline (honest grounding):
  *  1. Diagnose the bug      -> MODEL INFERENCE (labeled as such, no citations)
  *  2. Infer topic + query   -> retrieve the *concept* from notes (not raw code)
@@ -82,6 +99,7 @@ export async function runBugHunt(code: string, language?: string): Promise<BugHu
     tier: "reasoning",
   });
   const diag = diagnosisSchema.parse(raw);
+  const topic = canonicalizeTopic(diag.topic);
 
   // 3: retrieve the underlying concept by the inferred query (NOT the raw code).
   const retrieved = await retrieve(diag.retrievalQuery);
@@ -94,7 +112,7 @@ export async function runBugHunt(code: string, language?: string): Promise<BugHu
     ? questionsSchema.parse(
         await completeJSON({
           system: QUESTIONS_SYSTEM,
-          user: `TOPIC: ${diag.topic}\n\nSOURCES:\n${buildContext(concept)}`,
+          user: `TOPIC: ${topic}\n\nSOURCES:\n${buildContext(concept)}`,
           tier: "fast",
         }),
       ).questions
@@ -106,7 +124,7 @@ export async function runBugHunt(code: string, language?: string): Promise<BugHu
     .values({
       code,
       language: language ?? null,
-      topic: diag.topic,
+      topic: topic,
       diagnosis: diag.diagnosis,
       conceptCitations,
     })
@@ -120,7 +138,7 @@ export async function runBugHunt(code: string, language?: string): Promise<BugHu
       .insert(quizQuestions)
       .values({
         bugHuntId: bugHunt.id,
-        topic: diag.topic,
+        topic: topic,
         type: isMcq ? "mcq" : "short",
         prompt: q.prompt,
         options: isMcq ? q.options : [],
@@ -137,12 +155,12 @@ export async function runBugHunt(code: string, language?: string): Promise<BugHu
     });
   }
 
-  await recordTopicSignal(diag.topic, false);
+  await recordTopicSignal(topic, false);
 
   return {
     bugHuntId: bugHunt.id,
     diagnosis: diag.diagnosis,
-    topic: diag.topic,
+    topic: topic,
     groundingStatus: grounded ? "grounded" : "not_found",
     conceptCitations,
     questions,

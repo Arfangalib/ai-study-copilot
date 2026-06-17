@@ -91,7 +91,7 @@ src/
     api/ask/route.ts             Grounded Q&A (cite-or-refuse)
     page.tsx                     Upload + Ask UI
   db/
-    schema.ts                    9 tables incl. pgvector chunk store
+    schema.ts                    10 tables incl. pgvector chunk store
     index.ts                     Drizzle client
   lib/
     env.ts                       Validated, env-driven config

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const result = await gradeAttempt(parsed.data.quizQuestionId, parsed.data.userAnswer);
     return NextResponse.json(result);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Grading failed.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[quiz-attempts]", err);
+    return NextResponse.json({ error: "Grading failed." }, { status: 500 });
   }
 }

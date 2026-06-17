@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const result = await runBugHunt(parsed.data.code, parsed.data.language);
     return NextResponse.json(result);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Bug hunt failed.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[bug-hunt]", err);
+    return NextResponse.json({ error: "Bug hunt failed." }, { status: 500 });
   }
 }

@@ -10,7 +10,7 @@ export async function GET() {
     const [latest, history] = await Promise.all([getLatestEvalRun(), getEvalHistory()]);
     return NextResponse.json({ latest, history });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to load eval runs.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[eval/runs]", err);
+    return NextResponse.json({ error: "Failed to load eval runs." }, { status: 500 });
   }
 }

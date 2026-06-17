@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const result = await askGrounded(parsed.data.question);
     return NextResponse.json(result);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Ask failed.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[ask]", err);
+    return NextResponse.json({ error: "Ask failed." }, { status: 500 });
   }
 }

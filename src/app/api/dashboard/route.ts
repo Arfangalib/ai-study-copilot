@@ -20,7 +20,7 @@ export async function GET() {
     ]);
     return NextResponse.json({ coverage, weakTopics, recentAsks, recentBugHunts });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to load dashboard.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[dashboard]", err);
+    return NextResponse.json({ error: "Failed to load dashboard." }, { status: 500 });
   }
 }
