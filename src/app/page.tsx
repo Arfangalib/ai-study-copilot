@@ -32,6 +32,12 @@ export default function Home() {
           chunks it used. When the answer isn&apos;t in your materials, it refuses instead of
           guessing.
         </p>
+        <a
+          href="/eval"
+          className="mt-3 inline-block text-xs font-medium text-indigo-500 hover:text-indigo-400"
+        >
+          See how grounding quality is measured →
+        </a>
       </header>
 
       <UploadPanel />

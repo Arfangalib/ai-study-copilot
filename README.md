@@ -4,6 +4,10 @@ A study copilot that **answers only from your uploaded materials, cites the exac
 
 Built as a focused demonstration of trustworthy, enterprise-style AI: retrieval grounding, hallucination guardrails, and measurable evaluation.
 
+**[Live demo](https://ai-study-copilot-cyan.vercel.app/)** · **[Case study](CASE_STUDY.md)** — the why, the architecture, and the eval-driven 28%→100% citation-precision story.
+
+![Architecture](public/architecture.svg)
+
 ## Why this design
 
 Most "chat with your notes" apps will happily make things up. This one treats grounding as the core contract:
