@@ -95,7 +95,7 @@ export async function runBugHunt(code: string, language?: string): Promise<BugHu
         await completeJSON({
           system: QUESTIONS_SYSTEM,
           user: `TOPIC: ${diag.topic}\n\nSOURCES:\n${buildContext(concept)}`,
-          tier: "reasoning",
+          tier: "fast",
         }),
       ).questions
     : [];

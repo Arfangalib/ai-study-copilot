@@ -3,6 +3,7 @@ import { z } from "zod";
 import { gradeAttempt } from "@/lib/quiz";
 
 export const runtime = "nodejs";
+export const maxDuration = 60; // short-answer grading calls the model
 
 const schema = z.object({
   quizQuestionId: z.string().uuid(),

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { runBugHunt } from "@/lib/bug-hunt";
 
 export const runtime = "nodejs";
+export const maxDuration = 60; // diagnosis + question generation can take >10s
 
 const schema = z.object({
   code: z.string().min(1).max(20000),

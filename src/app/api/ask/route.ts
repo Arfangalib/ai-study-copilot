@@ -3,6 +3,7 @@ import { z } from "zod";
 import { askGrounded } from "@/lib/ask";
 
 export const runtime = "nodejs";
+export const maxDuration = 60; // retrieval + grounded completion can take >10s
 
 const schema = z.object({ question: z.string().min(1).max(2000) });
 
