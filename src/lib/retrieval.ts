@@ -57,13 +57,25 @@ export function isGrounded(
   return retrieved[0].score >= minScore;
 }
 
-/** Keep only chunks clearing the score bar, capped to `max`. Used to build citations. */
+/** How far below the top score a chunk may be and still be worth citing. */
+const CITATION_MARGIN = 0.08;
+
+/**
+ * Select the chunks worth citing: those clearing the score floor AND within a
+ * small margin of the top match, capped to `max`. This avoids padding an answer
+ * with marginally-related sources when one source clearly answers the question
+ * (which both reads better and raises citation precision).
+ */
 export function strongChunks(
   retrieved: RetrievedChunk[],
   minScore: number = env.RETRIEVAL_MIN_SCORE,
-  max = 4,
+  max = 3,
 ): RetrievedChunk[] {
-  return retrieved.filter((r) => r.score >= minScore).slice(0, max);
+  if (retrieved.length === 0) return [];
+  const top = retrieved[0].score;
+  return retrieved
+    .filter((r) => r.score >= minScore && r.score >= top - CITATION_MARGIN)
+    .slice(0, max);
 }
 
 /** Shape a retrieved chunk into a stored citation. */

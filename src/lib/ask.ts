@@ -32,22 +32,28 @@ function buildContext(chunks: RetrievedChunk[]): string {
     .join("\n\n");
 }
 
+export type AskOptions = {
+  /** Persist the query to ask history. Eval runs pass false to avoid polluting it. */
+  persist?: boolean;
+};
+
 /**
  * Core grounded Q&A. Retrieves, decides grounding by retrieval confidence, then
- * either answers strictly from the cited chunks or refuses. Persists the result.
+ * either answers strictly from the cited chunks or refuses. Persists by default.
  */
-export async function askGrounded(question: string): Promise<AskResult> {
+export async function askGrounded(
+  question: string,
+  opts: AskOptions = {},
+): Promise<AskResult> {
   const retrieved = await retrieve(question);
   const grounded = isGrounded(retrieved);
   const supporting = strongChunks(retrieved);
 
   if (!grounded || supporting.length === 0) {
-    return persist({
-      question,
-      answer: REFUSAL,
-      groundingStatus: "not_found",
-      citations: [],
-    });
+    return persist(
+      { question, answer: REFUSAL, groundingStatus: "not_found", citations: [] },
+      opts,
+    );
   }
 
   const answer = await complete({
@@ -58,23 +64,25 @@ export async function askGrounded(question: string): Promise<AskResult> {
 
   // The model is the second guardrail: it self-refuses when context is insufficient.
   if (!answer || answer.trim().toUpperCase().startsWith("NOT_FOUND")) {
-    return persist({
-      question,
-      answer: REFUSAL,
-      groundingStatus: "not_found",
-      citations: [],
-    });
+    return persist(
+      { question, answer: REFUSAL, groundingStatus: "not_found", citations: [] },
+      opts,
+    );
   }
 
-  return persist({
-    question,
-    answer,
-    groundingStatus: "grounded",
-    citations: supporting.map(toCitation),
-  });
+  return persist(
+    {
+      question,
+      answer,
+      groundingStatus: "grounded",
+      citations: supporting.map(toCitation),
+    },
+    opts,
+  );
 }
 
-async function persist(result: AskResult): Promise<AskResult> {
+async function persist(result: AskResult, opts: AskOptions): Promise<AskResult> {
+  if (opts.persist === false) return result;
   await db.insert(askQueries).values({
     question: result.question,
     answer: result.answer,

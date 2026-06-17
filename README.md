@@ -12,6 +12,18 @@ Most "chat with your notes" apps will happily make things up. This one treats gr
 - **Honest about inference.** Bug diagnosis is labeled *model inference* (it comes from the model's reasoning, not your notes). Citations are reserved for the concept that's actually retrieved from your materials.
 - **Measured, not claimed.** An eval harness scores citation precision, refusal accuracy, and answer support rate over a seeded question set.
 
+## Evaluation
+
+A fixed 20-question eval set runs through the real ask pipeline — answerable questions from the notes plus plausible out-of-corpus questions (Dijkstra, B-trees, Kubernetes) that must be refused. Three honest metrics, viewable on the `/eval` dashboard:
+
+| Metric | Latest run | What it measures |
+| --- | --- | --- |
+| Citation precision | **100%** | Of the sources an answer cites, the fraction that are the correct source |
+| Refusal accuracy | **100%** | How often the answer-vs-refuse gate makes the right call |
+| Answer support | **~92%** | Fraction of answer claims backed by the cited excerpts (LLM judge) |
+
+Runs are CLI-only (`npm run eval`) so the public demo can't be made to spend on model calls; the dashboard is read-only. See `src/eval/`.
+
 ## Production safeguards
 
 Because the demo is public and backed by a paid model API, the API routes are protected against runaway cost and abuse:
@@ -90,4 +102,5 @@ src/
 
 - **Week 1 — done.** Ingestion, grounded ask (cite-or-refuse), UI, deployed live.
 - **Week 2 — done.** Bug-Hunt mode (diagnosis labeled as model inference → cited concept from notes → grounded practice questions), server-side quiz grading, and EWMA weak-topic tracking.
-- **Next:** Week 3 evaluation dashboard (citation precision, refusal accuracy, answer support rate), then polish + case study.
+- **Week 3 — done.** Evaluation harness + `/eval` dashboard (citation precision, refusal accuracy, answer support) and a `/dashboard` for coverage + weak topics.
+- **Next:** Week 4 polish + written case study.
