@@ -1,0 +1,83 @@
+# AI Study Copilot — Grounded Study Assistant
+
+A study copilot that **answers only from your uploaded materials, cites the exact source chunks it used, and refuses to hallucinate** when the answer isn't in your notes. Bug-hunt mode turns a mistake in your code into a cited concept review plus targeted practice — and a live **evaluation dashboard** proves the grounding quality with real metrics.
+
+Built as a focused demonstration of trustworthy, enterprise-style AI: retrieval grounding, hallucination guardrails, and measurable evaluation.
+
+## Why this design
+
+Most "chat with your notes" apps will happily make things up. This one treats grounding as the core contract:
+
+- **Cite or refuse.** Every answer is built strictly from retrieved chunks and cites them, or returns a clear "not found in your materials" — never a fabricated citation.
+- **Honest about inference.** Bug diagnosis is labeled *model inference* (it comes from the model's reasoning, not your notes). Citations are reserved for the concept that's actually retrieved from your materials.
+- **Measured, not claimed.** An eval harness scores citation precision, refusal accuracy, and answer support rate over a seeded question set.
+
+## Stack
+
+- **Next.js (App Router) + TypeScript**, Tailwind CSS
+- **Postgres + pgvector** (Supabase) via **Drizzle ORM**
+- **OpenAI** for embeddings + completions, behind a thin swappable provider (`src/lib/llm/provider.ts`) — model ids are env-driven
+- **Vitest** (unit) + **Playwright** (e2e)
+
+## Getting started
+
+1. **Install**
+   ```bash
+   npm install
+   ```
+
+2. **Configure env** — copy `.env.example` to `.env.local` and fill in:
+   - `DATABASE_URL` — Supabase Postgres connection string (Transaction pooler, port 6543)
+   - `OPENAI_API_KEY`
+   - Model ids (`OPENAI_REASONING_MODEL`, `OPENAI_FAST_MODEL`, `OPENAI_EMBEDDING_MODEL`) are pre-filled.
+
+3. **Create the schema** (enables pgvector + creates all tables)
+   ```bash
+   npm run db:migrate
+   ```
+
+4. **Seed sample DSA/cloud notes** (optional, makes the demo work immediately)
+   ```bash
+   npm run db:seed
+   ```
+
+5. **Run**
+   ```bash
+   npm run dev
+   ```
+   Open http://localhost:3000 — paste notes, then ask a grounded question.
+
+## Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run db:generate` | Generate a migration from the Drizzle schema |
+| `npm run db:migrate` | Apply migrations (enables pgvector, creates tables) |
+| `npm run db:seed` | Load a small DSA + cloud corpus |
+| `npm test` | Run unit tests |
+| `npm run test:e2e` | Run Playwright e2e tests |
+
+## Project layout
+
+```
+src/
+  app/
+    api/sources/upload/route.ts  Ingest notes/PDF -> chunk -> embed -> store
+    api/ask/route.ts             Grounded Q&A (cite-or-refuse)
+    page.tsx                     Upload + Ask UI
+  db/
+    schema.ts                    9 tables incl. pgvector chunk store
+    index.ts                     Drizzle client
+  lib/
+    env.ts                       Validated, env-driven config
+    chunk.ts                     Deterministic text chunker (unit-tested)
+    ingest.ts                    Ingestion pipeline + PDF extraction
+    retrieval.ts                 pgvector search + grounding decision
+    ask.ts                       Grounded answering logic
+    llm/provider.ts              Swappable LLM boundary
+```
+
+## Status
+
+Week 1 vertical slice: ingestion, grounded ask (cite-or-refuse), and UI are implemented and deployable. Bug-hunt mode, weak-topic tracking, and the eval dashboard follow.
