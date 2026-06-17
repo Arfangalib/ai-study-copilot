@@ -13,6 +13,9 @@ const schema = z.object({
   OPENAI_EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
   RETRIEVAL_MIN_SCORE: z.coerce.number().min(0).max(1).default(0.25),
   RETRIEVAL_TOP_K: z.coerce.number().int().positive().default(6),
+  // Spend protection for the public demo.
+  RATE_LIMIT_PER_MIN: z.coerce.number().int().positive().default(5),
+  DAILY_REQUEST_CAP: z.coerce.number().int().positive().default(300),
 });
 
 const parsed = schema.safeParse(process.env);

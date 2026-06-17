@@ -8,6 +8,13 @@
       "when": 1781657614200,
       "tag": "0000_futuristic_absorbing_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781668944960,
+      "tag": "0001_add_usage_events",
+      "breakpoints": true
     }
   ]
 }

@@ -12,6 +12,14 @@ Most "chat with your notes" apps will happily make things up. This one treats gr
 - **Honest about inference.** Bug diagnosis is labeled *model inference* (it comes from the model's reasoning, not your notes). Citations are reserved for the concept that's actually retrieved from your materials.
 - **Measured, not claimed.** An eval harness scores citation precision, refusal accuracy, and answer support rate over a seeded question set.
 
+## Production safeguards
+
+Because the demo is public and backed by a paid model API, the API routes are protected against runaway cost and abuse:
+
+- **Per-IP rate limiting** and a **global daily request cap** (DB-backed, so they hold across serverless instances) — see `src/lib/rate-limit.ts`.
+- **`max_completion_tokens` ceiling** on every model call to bound per-request cost.
+- Secrets are server-side only (no `NEXT_PUBLIC_` exposure); IPs are stored hashed.
+
 ## Stack
 
 - **Next.js (App Router) + TypeScript**, Tailwind CSS

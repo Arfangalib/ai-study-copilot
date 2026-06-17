@@ -8,6 +8,10 @@ import { env } from "@/lib/env";
  */
 const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
 
+/** Hard ceiling on output tokens per call -- a runaway-cost guard, generous
+ * enough not to truncate our short outputs (incl. reasoning tokens). */
+const MAX_COMPLETION_TOKENS = 4000;
+
 /** Which configured model to use for a call. */
 export type ModelTier = "reasoning" | "fast";
 
@@ -45,6 +49,7 @@ export async function complete({
 }: CompleteArgs): Promise<string> {
   const res = await client.chat.completions.create({
     model: modelFor(tier),
+    max_completion_tokens: MAX_COMPLETION_TOKENS,
     messages: [
       { role: "system", content: system },
       { role: "user", content: user },
@@ -64,6 +69,7 @@ export async function completeJSON<T = unknown>({
 }: CompleteArgs): Promise<T> {
   const res = await client.chat.completions.create({
     model: modelFor(tier),
+    max_completion_tokens: MAX_COMPLETION_TOKENS,
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: system },

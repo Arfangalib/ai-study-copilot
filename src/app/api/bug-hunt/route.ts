@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { runBugHunt } from "@/lib/bug-hunt";
+import { guardRequest } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60; // diagnosis + question generation can take >10s
@@ -13,6 +14,9 @@ const schema = z.object({
 /** Diagnose a bug (model inference), then cite the underlying concept + practice. */
 export async function POST(req: NextRequest) {
   try {
+    const guard = await guardRequest(req.headers, "bug-hunt");
+    if (!guard.ok) return NextResponse.json({ error: guard.message }, { status: guard.status });
+
     const parsed = schema.safeParse(await req.json());
     if (!parsed.success) {
       return NextResponse.json(

@@ -133,6 +133,21 @@ export const evalCases = pgTable("eval_cases", {
   notes: text("notes"),
 });
 
+/** Lightweight request log for rate limiting + a global daily spend cap. IP is hashed. */
+export const usageEvents = pgTable(
+  "usage_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ipHash: text("ip_hash").notNull(),
+    route: text("route").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("usage_events_created_idx").on(t.createdAt),
+    index("usage_events_ip_created_idx").on(t.ipHash, t.createdAt),
+  ],
+);
+
 /** One eval run's aggregate metrics + per-case detail. */
 export const evalRuns = pgTable("eval_runs", {
   id: uuid("id").primaryKey().defaultRandom(),
